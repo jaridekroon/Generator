@@ -25,6 +25,12 @@ public class Segment {
     }
 
     public DoublePoint intersection(Segment s) throws InvalidParameterException{
+        /** Assume shared endpoint does not count as intersection */
+        if(this.first.equals(s.getFirst()) || this.first.equals(s.getSecond())
+                || this.second.equals(s.getFirst()) || this.second.equals(s.getSecond())) {
+            return null;
+        }
+
         int x1 = this.first.getX();
         int y1 = this.first.getY();
         int x2 = this.second.getX();
@@ -81,9 +87,9 @@ public class Segment {
         }
 
         //neither vertical
-        double a1 = (y2-y1)/(x2-x1);
+        double a1 = ((double)y2-y1)/(x2-x1);
         double b1 = y1 - a1*x1;
-        double a2 = (y4-y3)/(x4-x3);
+        double a2 = ((double)y4-y3)/(x4-x3);
         double b2 = y3 - a2*x3;
         if((y2-y1)*(x4-x3) == (x2-x1)*(y4-y3)) {
             //same slope
