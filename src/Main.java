@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 public class Main {
@@ -78,20 +79,69 @@ public class Main {
         for(Segment s : list) {
             System.out.println(s.getFirst().getX() + " " + s.getFirst().getY() + " " + s.getSecond().getX() + " " + s.getSecond().getY());
         }
-        System.out.println();
-        System.out.println("Nr of intersections: " + intersections.size());
     }
 
     public static void main(String[] args) {
         Main m = new Main();
-        int max = 50;
+        int max = 1000;
         int min = 0;
-        int n = 10;
+        int n = 25;
 
         ArrayList<Segment> list = m.generate(n, min, max); //generate input list
         m.printList(list); //print to console
 
+
+        System.out.println();
+        System.out.println("Nr of intersections: " + m.intersections.size());
+        System.out.println("Nr of events: " + (m.intersections.size() + 2*n));
+
+        //compute events 3,17,99
+        ArrayList<Pair<DoublePoint,String>> events = new ArrayList<>();
+        for(DoublePoint p : m.intersections) {
+            events.add(new Pair<>(p,"intersection"));
+        }
+        for(Segment s : m.segments) {
+            Point high;
+            Point low;
+            //no horizontal segments
+            if(s.getFirst().getY() > s.getSecond().getY()) {
+                high = s.getFirst();
+                low = s.getSecond();
+            } else {
+                low = s.getFirst();
+                high = s.getSecond();
+            }
+            events.add(new Pair<>(new DoublePoint(high.getY(),high.getX()),"start"));
+            events.add(new Pair<>(new DoublePoint(low.getY(),low.getX()),"end"));
+        }
+
+        Collections.sort(events, (o1,o2) -> o1.left.getY() > o2.left.getY() ? -1
+                : o1.left.getY() < o2.left.getY() ? 1
+                : o1.left.getX() < o2.left.getX() ? -1
+                : o1.left.getX() > o2.left.getX() ? 1 : 0);
+
+        System.out.println();
+        System.out.println("Event 3: " + events.get(2).getRight());
+        System.out.println("Event 17: " + events.get(16).getRight());
+        System.out.println("Event 99: " + events.get(98).getRight());
+
+
         SVGVisualizer v = new SVGVisualizer();
         v.draw(list,"test",max); //create svg
+    }
+
+    public static class Pair<L,R> {
+
+        private final L left;
+        private final R right;
+
+        public Pair(L left, R right) {
+            this.left = left;
+            this.right = right;
+        }
+
+        public L getLeft() { return left; }
+        public R getRight() { return right; }
+
     }
 }
